@@ -6,5 +6,6 @@ demos/*.json
 generated
 *.disabled
 /*.json
+!/gridfinity_basic_cup.json
 /*.stl
 .DS_Store

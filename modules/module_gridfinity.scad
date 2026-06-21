@@ -37,7 +37,8 @@ module pad_grid(
           $pad_copy_size.x, 
           $pad_copy_size.y,
           render_top=render_top,
-          render_bottom=render_bottom);
+          render_bottom=render_bottom,
+          bin_bottom=true);
 }
 
 // like a cylinder but produces a square solid instead of a round one
@@ -183,7 +184,8 @@ module pad_oversize(
   render_top = true,
   render_bottom = true,
   remove_bottom_taper = false,
-  extend_down = 0) {
+  extend_down = 0,
+  bin_bottom = false) {
   
   assert(!is_undef(num_x), "num_x is undefined");
   assert(is_num(num_x), "num_x must be a number");
@@ -193,6 +195,7 @@ module pad_oversize(
   assert(is_num(margins), "margins must be a number >= 0");
   assert(!is_undef(extend_down), "extend_down is undefined");
   assert(is_num(extend_down), "extend_down must be a number >= 0");
+  assert(is_bool(bin_bottom));
   
   if(env_help_enabled("trace")) echo("pad_oversize", num_x=num_x, num_y=num_y, margins= margins);
 
@@ -206,6 +209,9 @@ module pad_oversize(
   bevel2_bottom = 2.6;  // z of bottom of second bevel
   bevel2_top = 5;       // z of top of second bevel
   bonus_ht = 0.2;       // extra height (and radius) on second bevel
+  // Keep stacking/baseplate/lip cavities on the legacy profile; only real bin bottoms get the print cleanup.
+  use_bin_bottom_profile = bin_bottom && render_bottom;
+  bottom_taper_height = use_bin_bottom_profile ? 1.9 : 1.9+bevel2_top-bevel2_bottom+bonus_ht;
   
   // female parts are a bit oversize for a nicer fit
   radialgap = margins ? 0.25 : 0;  // oversize cylinders for a bit of clearance
@@ -213,6 +219,12 @@ module pad_oversize(
   //remove axialdown as it messes up the placement of the attachements 
   axialdown =0;
   fudgeFactor = 0.01;
+  bottom_taper_radius = env_corner_radius()-2.15+radialgap;
+  top_taper_radius = env_corner_radius()+0.25+radialgap+bonus_ht;
+  top_taper_render_radius = top_taper_radius - (use_bin_bottom_profile ? 0.3 : 0);
+  small_bottom_radius = remove_bottom_taper ? bottom_taper_radius : 0.8+radialgap;
+  // Match the lower base step fragment count to the larger top taper when $fn is not explicitly set.
+  matched_fs = function(radius) $fn > 0 || !use_bin_bottom_profile || top_taper_render_radius <= 0 ? $fs : $fs * radius / top_taper_render_radius;
   
   translate([0, 0, -axialdown])
   difference() {
@@ -222,11 +234,11 @@ module pad_oversize(
         hull() cornercopy(pad_corner_position, num_x, num_y) {
           if (sharp_corners) {
             translate(bevel2_bottom) 
-            cylsq2(d1=(env_corner_radius()-2.15+radialgap)*2, d2=(env_corner_radius()+0.25+radialgap+bonus_ht)*2, h=bevel2_top-bevel2_bottom+bonus_ht);
+            cylsq2(d1=bottom_taper_radius*2, d2=top_taper_radius*2, h=bevel2_top-bevel2_bottom+bonus_ht);
           }
           else {
             tz(bevel2_bottom) 
-            cylinder(d1=(env_corner_radius()-2.15+radialgap)*2, d2=(env_corner_radius()+0.25+radialgap+bonus_ht)*2, h=bevel2_top-bevel2_bottom+bonus_ht);
+            cylinder(d1=bottom_taper_radius*2, d2=top_taper_render_radius*2, h=bevel2_top-bevel2_bottom+bonus_ht);
           }
         }
       }
@@ -237,12 +249,12 @@ module pad_oversize(
           if (sharp_corners) {
             cylsq(d=1.6+2*radialgap, h=0.1);
             translate([0, 0, bevel1_top]) 
-            cylsq(d=(env_corner_radius()-2.15+radialgap)*2, h=1.9+bevel2_top-bevel2_bottom+bonus_ht);
+            cylsq(d=bottom_taper_radius*2, h=bottom_taper_height);
           }
           else {
-            cylinder(d=remove_bottom_taper ? (env_corner_radius()-2.15+radialgap)*2 : 1.6+2*radialgap, h=0.1);
+            cylinder(d=small_bottom_radius*2, h=0.1, $fs=matched_fs(small_bottom_radius));
             translate([0, 0, bevel1_top]) 
-              cylinder(d=(env_corner_radius()-2.15+radialgap)*2, h=1.9+bevel2_top-bevel2_bottom+bonus_ht);
+              cylinder(d=bottom_taper_radius*2, h=bottom_taper_height, $fs=matched_fs(bottom_taper_radius));
           }
         }
       }
@@ -256,7 +268,7 @@ module pad_oversize(
             cylsq(d=1.6+2*radialgap, h=extend_down+fudgeFactor);
           }
           else {
-            cylinder(d=1.6+2*radialgap, h=extend_down+fudgeFactor);
+            cylinder(d=1.6+2*radialgap, h=extend_down+fudgeFactor, $fs=matched_fs(0.8+radialgap));
           }
         }
         //for baseplate patterns

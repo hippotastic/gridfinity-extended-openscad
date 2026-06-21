@@ -274,7 +274,7 @@ text_2_text = "Gridfinity Extended";
 
 /* [debug] */
 // Debug slice
-cut = [0,0,0]; //0.1
+cut = [0,0,0]; //0.01
 
 // Enable loging of help messages during render.
 enable_help = "disabled"; //[info,debug,trace]
@@ -289,9 +289,9 @@ set_colour = "enable"; //[disabled, enable, preview, lip]
 // Where to render the model
 render_position = "center"; //[default,center,zero]
 // Minimum angle for a fragment (fragments = 360/fa).  Low is more fragments
-fa = 6;
+fa = 2;
 // minimum size of a fragment.  Low is more fragments
-fs = 0.4;
+fs = 0.2;
 // number of fragments, overrides $fa and $fs
 fn = 0;
 // set random seed for
