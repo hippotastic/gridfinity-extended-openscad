@@ -78,10 +78,18 @@ module grid_block(
   tz(env_pitch().z*num_z-fudgeFactor*2)
   if(filledin == "enabledfilllip"){
     color(env_colour(color_topcavity))
+    difference() {
       tz(-fudgeFactor)
       hull() 
       cornercopy(block_corner_position, num_x, num_y) 
       cylinder(r=env_corner_radius(), h=lipHeight);
+
+      bin_outer_wall_clearance_cutout(
+        num_x = num_x,
+        num_y = num_y,
+        z = -fudgeFactor*2,
+        height = lipHeight + fudgeFactor*4);
+    }
   } else {
     
     cupLip(
@@ -155,6 +163,12 @@ module grid_block(
       corner_radius = env_corner_radius(),
       block_corner_position=block_corner_position,
       cupBase_settings = cupBase_settings);
+
+    bin_outer_wall_clearance_cutout(
+      num_x = num_x,
+      num_y = num_y,
+      z = -fudgeFactor,
+      height = env_pitch().z*num_z + fudgeFactor*3);
    
     if(center_magnet_size[iCylinderDimension_Diameter]){
       //Center Magnet

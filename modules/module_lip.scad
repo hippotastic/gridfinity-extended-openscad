@@ -165,6 +165,11 @@ module cupLip(
         lip_remove_inner_grid = lip_remove_inner_grid,
         raise_lip= raise_lip,
         align_grid = align_grid);
+
+      bin_outer_wall_clearance_cutout(
+        num_x = num_x,
+        num_y = num_y,
+        height = raise_lip + lipHeight + fudgeFactor*4);
     }
 }
 

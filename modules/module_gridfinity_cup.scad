@@ -363,7 +363,7 @@ module gridfinity_cup(
   num_z = is_undef(height) ? $num_z : calcDimensionHeight(height, true);
 
   //wall_thickness default, height < 8 0.95, height < 16 1.2, height > 16 1.6 (Zack's design is 0.95 mm)
-  wall_thickness = wallThickness(wall_thickness, num_z);
+  wall_thickness = wallThickness(wall_thickness, num_z) + env_outer_wall_clearance();
 
   filled_in = validateFilledIn(filled_in);
   label_settings=ValidateLabelSettings(label_settings);
@@ -393,7 +393,7 @@ module gridfinity_cup(
   calculated_vertical_separator_positions = calculateSeparators(
     separator_config = vertical_chambers[iChamber_irregular_subdivisions] 
       ? vertical_chambers[iChamber_separator_config]  
-      : splitChamber(vertical_chambers[iChamber_count]-1, divider_width=vertical_chambers[iChamber_wall_thickness].x, container_width=num_x*env_pitch().x - env_clearance().x - wall_thickness*2), 
+      : splitChamber(vertical_chambers[iChamber_count]-1, divider_width=vertical_chambers[iChamber_wall_thickness].x, container_width=num_x*env_pitch().x - env_clearance().x - wall_thickness*2),
     length = env_pitch().y*num_y,
     height = env_pitch().z*(num_z)-sepFloorHeight+fudgeFactor*2-max(headroom, vertical_chambers[iChamber_wall_headroom]),
     wall_thickness = vertical_chambers[iChamber_wall_thickness],
@@ -405,7 +405,7 @@ module gridfinity_cup(
   calculated_horizontal_separator_positions = calculateSeparators(
     separator_config = horizontal_chambers[iChamber_irregular_subdivisions] 
       ? horizontal_chambers[iChamber_separator_config] 
-      : splitChamber(horizontal_chambers[iChamber_count]-1, divider_width=horizontal_chambers[iChamber_wall_thickness].x, container_width=num_y*env_pitch().y - env_clearance().y - wall_thickness*2), 
+      : splitChamber(horizontal_chambers[iChamber_count]-1, divider_width=horizontal_chambers[iChamber_wall_thickness].x, container_width=num_y*env_pitch().y - env_clearance().y - wall_thickness*2),
     length = env_pitch().x*num_x,
     height = env_pitch().z*(num_z)-sepFloorHeight+fudgeFactor*2-max(headroom, horizontal_chambers[iChamber_wall_headroom]),
     wall_thickness = horizontal_chambers[iChamber_wall_thickness],
@@ -670,6 +670,7 @@ module gridfinity_cup(
     ,"finger_slide_settings",finger_slide_settings
     ,"cupBase_settings",cupBase_settings
     ,"wall_thickness",wall_thickness
+    ,"outer_wall_clearance",env_outer_wall_clearance()
     ,"vertical_chambers",vertical_chambers
     ,"horizontal_chambers",horizontal_chambers
     ,"lip_settings",lip_settings
@@ -1343,7 +1344,7 @@ module basic_cavity(num_x, num_y, num_z,
           roundedCylinder(
             h=cavityHeight,
             r=innerWallRadius,
-            roundedr1=min(cavityHeight, cavity_floor_radius),
+            roundedr1=min(cavityHeight, cavity_floor_radius, innerWallRadius),
             roundedr2=0);
     } //union of main cavity
 

@@ -284,6 +284,8 @@ enable_help = "disabled"; //[info,debug,trace]
 pitch = [42,42,7];  //[0:1:9999]
 // clearance around the bin, will reduce the bin by this amount in mm.
 clearance = [0.5, 0.5, 0];
+// Extra inset for the outside cup wall only. The base grid keeps the normal clearance.
+outer_wall_clearance = 0; //[0:0.1:1]
 // Assign colours to the bin
 set_colour = "enable"; //[disabled, enable, preview, lip]
 // Where to render the model
@@ -318,6 +320,7 @@ set_environment(
   help = enable_help,
   pitch = pitch,
   clearance = clearance,
+  outer_wall_clearance = outer_wall_clearance,
   cut = cut,
   setColour = set_colour,
   randomSeed = random_seed,

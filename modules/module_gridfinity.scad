@@ -53,6 +53,38 @@ module cylsq2(d1, d2, h) {
   square([d1, d1], center=true);
 }
 
+module bin_outer_wall_clearance_cutout(
+  num_x,
+  num_y,
+  height,
+  z = 0,
+  clearance = env_outer_wall_clearance()) {
+  assert(is_num(num_x) && num_x > 0, "num_x must be a number greater than 0");
+  assert(is_num(num_y) && num_y > 0, "num_y must be a number greater than 0");
+  assert(is_num(height), "height must be a number");
+  assert(is_num(z), "z must be a number");
+  assert(is_num(clearance) && clearance >= 0, "clearance must be a non-negative number");
+
+  if(clearance > 0 && height > 0) {
+    assert(clearance < env_corner_radius(), "outer_wall_clearance must be smaller than the cup corner radius");
+
+    outer_size = [env_pitch().x - env_clearance().x, env_pitch().y - env_clearance().y];
+    block_corner_position = [outer_size.x/2 - env_corner_radius(), outer_size.y/2 - env_corner_radius()];
+
+    translate([0, 0, z])
+    difference() {
+      translate([-fudgeFactor, -fudgeFactor, 0])
+        cube([env_pitch().x*num_x + fudgeFactor*2, env_pitch().y*num_y + fudgeFactor*2, height + fudgeFactor]);
+
+      // A true inward offset keeps the corner centers fixed and reduces the corner radius.
+      translate([0, 0, -fudgeFactor])
+        hull()
+        cornercopy(block_corner_position, num_x, num_y)
+          cylinder(r=env_corner_radius() - clearance, h=height + fudgeFactor*3);
+    }
+  }
+}
+
 module frame_additives(
   num_x = 2, 
   num_y = 1, 

@@ -18,7 +18,9 @@ module set_environment(
   corner_radius = gf_cup_corner_radius,
   randomSeed = 0,
   force_render = true,
-  generate_filter = ""){
+  generate_filter = "",
+  outer_wall_clearance = 0){
+  assert(is_num(outer_wall_clearance) && outer_wall_clearance >= 0, "outer_wall_clearance must be a non-negative number");
   
   //Set special variables, that child modules can use
   $pitch = pitch;
@@ -28,6 +30,7 @@ module set_environment(
   $randomSeed = randomSeed;
   $forceRender = force_render;
   $clearance = clearance;
+  $outer_wall_clearance = outer_wall_clearance;
   $corner_radius = corner_radius;
   $user_width = width;
   $user_depth = depth;
@@ -51,7 +54,7 @@ module set_environment(
   echo("🟩set_environment", fs=$fs, fa=$fa, fn=$fn);
   echo("🟩set_environment", width=width, depth=depth, height=height, pitch=pitch);
   echo("🟩set_environment", num_x=num_x, num_y=num_y, num_z=num_z);
-  echo("🟩set_environment", clearance=clearance, corner_radius=corner_radius, height_includes_lip=height_includes_lip, lip_enabled=lip_enabled);
+  echo("🟩set_environment", clearance=clearance, outer_wall_clearance=outer_wall_clearance, corner_radius=corner_radius, height_includes_lip=height_includes_lip, lip_enabled=lip_enabled);
   echo("🟩set_environment", render_position=render_position, cut=cut, help=help, setColour=setColour, randomSeed=randomSeed, force_render=force_render, generate_filter=generate_filter);
   
   //Position the object
@@ -83,6 +86,7 @@ function env_numx() = is_undef($num_x) || !is_num($num_x) ? 0 : $num_x;
 function env_numy() = is_undef($num_y) || !is_num($num_y) ? 0 : $num_y;
 function env_numz() = is_undef($num_z) || !is_num($num_z) ? 0 : $num_z;
 function env_clearance() = is_undef($clearance) || !is_list($clearance) ? [0.5, 0.5, 0] : $clearance;
+function env_outer_wall_clearance() = is_undef($outer_wall_clearance) || !is_num($outer_wall_clearance) ? 0 : $outer_wall_clearance;
 function env_generate_filter() = (is_undef($generate_filter) || !is_string($generate_filter)) ? "" : $generate_filter;
 
 function env_pitch() =  is_undef($pitch) || !is_list($pitch) ? [gf_pitch, gf_pitch, gf_zpitch] : $pitch; 
@@ -121,4 +125,3 @@ function env_help_enabled(level) =
             : $showHelp == "trace" && (level == "info" || level == "debug" || level == "trace") ? true
             : false
           : false;
-          

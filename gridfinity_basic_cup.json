@@ -372,6 +372,7 @@
             "label_size": "[1, 13, 0, 0.6]",
             "label_style": "normal",
             "lip_style": "none",
+            "outer_wall_clearance": "0.10000000000000001",
             "render_position": "center",
             "sub_pitch": "2",
             "vertical_separator_bend_angle": "0",
