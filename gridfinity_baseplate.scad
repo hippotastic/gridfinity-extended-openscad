@@ -63,6 +63,14 @@ Connector_Position = "center_wall"; //["center_wall","intersection","both"]
 Connector_Clip_Enabled = false;
 Connector_Clip_Size = 10;
 Connector_Clip_Tolerance = 0.1;
+Connector_Clip_Snap_Enabled = false;
+Connector_Clip_Snap_Cutout_Preview = false;
+Connector_Clip_Baseplate_Preview = false;
+
+/* [Thin Snap Together Top Settings] */
+thin_snap_top_friction_fit = 0.10; // [0:0.05:0.30]
+thin_snap_top_z_axis_fit = 0.20; // [0:0.05:0.40]
+thin_snap_top_snap_flex = 0.30; // [0:0.05:0.60]
 
 //This feature is not yet finalised, or working properly.
 Connector_Butterfly_Enabled = false;
@@ -236,25 +244,55 @@ iPlate_posGrid = 1;
 iPlate_outerSize = 2;
 iPlate_posOuter = 3;
 
+module _connector_clip_preview(
+  straightWall = false,
+  straightIntersection = false,
+  fullIntersection = false) {
+
+  clipHeight = 0.8;
+  clipFrameHeight = outer_Height > 0 ? outer_Height : 4;
+  previewClearance = Connector_Clip_Tolerance + 0.02;
+
+  ClipConnector(
+    size=Connector_Clip_Size,
+    height=clipHeight,
+    frameHeight=clipFrameHeight,
+    straightWall=straightWall,
+    straightIntersection=straightIntersection,
+    clearance=Connector_Clip_Tolerance,
+    clipSnapEnabled=Connector_Clip_Snap_Enabled,
+    clipSnapFrictionFit=thin_snap_top_friction_fit,
+    clipSnapZAxisFit=thin_snap_top_z_axis_fit,
+    clipSnapFlex=thin_snap_top_snap_flex,
+    fullIntersection=fullIntersection);
+
+  if(Connector_Clip_Snap_Cutout_Preview)
+  color([0.1, 0.35, 0.9, 0.30])
+  ClipCutterShape(
+    size=Connector_Clip_Size,
+    height=clipHeight,
+    frameHeight=clipFrameHeight,
+    straightWall=straightWall,
+    straightIntersection=straightIntersection,
+    clearance=previewClearance,
+    clipSnapEnabled=Connector_Clip_Snap_Enabled,
+    clipSnapFrictionFit=thin_snap_top_friction_fit,
+    clipSnapZAxisFit=thin_snap_top_z_axis_fit,
+    clipSnapFlex=thin_snap_top_snap_flex,
+    clipSnapPreview=true,
+    fullIntersection=fullIntersection);
+}
+
 if(Connector_Only)
 {
   if(Connector_Clip_Enabled) {
-    ClipConnector(
-      size=Connector_Clip_Size,
-      clearance = Connector_Clip_Tolerance,
-      fullIntersection = true);
+    _connector_clip_preview(fullIntersection=true);
 
     translate([0,15,0])
-    ClipConnector(
-      size=Connector_Clip_Size,
-      straightIntersection = true,
-      clearance = Connector_Clip_Tolerance);
+    _connector_clip_preview(straightIntersection=true);
 
     translate([0,30,0])
-    ClipConnector(
-      size=Connector_Clip_Size,
-      straightWall = true,
-      clearance = Connector_Clip_Tolerance);
+    _connector_clip_preview(straightWall=true);
   }
 
   if(Connector_Butterfly_Enabled)
@@ -356,7 +394,12 @@ else
         connectorFilamentDiameter = Connector_Filament_Diameter,
         connectorFilamentLength = Connector_Filament_Length,
         connectorSnapsStyle = Connector_Snaps_Enabled,
-        connectorSnapsClearance = Connector_Snaps_Clearance)
+        connectorSnapsClearance = Connector_Snaps_Clearance,
+        connectorClipSnapEnabled = Connector_Clip_Snap_Enabled,
+        connectorClipSnapFrictionFit = thin_snap_top_friction_fit,
+        connectorClipSnapZAxisFit = thin_snap_top_z_axis_fit,
+        connectorClipSnapFlex = thin_snap_top_snap_flex,
+        connectorClipBaseplatePreview = Connector_Clip_Baseplate_Preview)
     );
   }
 }

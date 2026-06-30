@@ -22,6 +22,8 @@ Default_Connector_Position = "center_wall";
 Default_Connector_Clip_Enabled = false;
 Default_Connector_Clip_Size = 10;
 Default_Connector_Clip_Tolerance = 0.1;
+Default_Connector_Clip_Snap_Enabled = false;
+Default_Connector_Clip_Baseplate_Preview = false;
 
 //This feature is not yet finalised, or working properly. 
 Default_Connector_Butterfly_Enabled = false;
@@ -210,6 +212,7 @@ module baseplate(
           secondaryCornerRadius = secondary_corner_radius,
           cornerRoles = corner_roles,
       roundedCorners=roundedCorners,
+      frameConnectorSettings=frameConnectorSettings,
       remove_bottom_taper=remove_bottom_taper){
         frame_connector_cavities(
           width = width, 

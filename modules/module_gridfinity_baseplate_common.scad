@@ -85,6 +85,17 @@ function decimaltobitwise(v1, v2) =
       v1==1 && v2 == 0 ? 4 :
       v1==1 && v2 == 1 ? 8 : 0;  
 
+function _frame_plain_lip_height(height = 4, extra_down = 0) =
+  extra_down > 0 ? height - 0.6 : height;
+
+function _frame_plain_connector_height(
+  outer_height = 0,
+  extra_down = 0,
+  height = 4) =
+  outer_height > 0
+    ? max(0, outer_height - extra_down)
+    : _frame_plain_lip_height(height = height, extra_down = extra_down);
+
 module frame_plain(
     grid_num_x, 
     grid_num_y, 
@@ -109,7 +120,11 @@ module frame_plain(
     reduceWallTaper = false) {
   
   secondaryCornerRadius = secondaryCornerRadius == -1 ? cornerRadius : secondaryCornerRadius;
-  frameLipHeight = extra_down > 0 ? height -0.6 : height;
+  frameLipHeight = _frame_plain_lip_height(height = height, extra_down = extra_down);
+  frameConnectorFrameHeight = _frame_plain_connector_height(
+    outer_height = outer_height,
+    extra_down = extra_down,
+    height = height);
   frameWallReduction = reducedWallHeight > 0 ? max(0, frameLipHeight-reducedWallHeight) : 0;
 
   centerGridPosition = [
@@ -130,7 +145,8 @@ module frame_plain(
       grid_num_x >= outer_num_x || position_grid_in_outer_x == "near", 
       grid_num_x >= outer_num_x || position_grid_in_outer_x == "far"];
 
-  if(env_help_enabled("debug")) echo("frame_plain", allowConnectors=$allowConnectors, grid_num_x=grid_num_x, position_grid_in_outer_x=position_grid_in_outer_x, centerGridPosition=centerGridPosition);
+  if(env_help_enabled("debug")) echo("frame_plain", allowConnectors=$allowConnectors, grid_num_x=grid_num_x, position_grid_in_outer_x=position_grid_in_outer_x, centerGridPosition=centerGridPosition, frameConnectorFrameHeight=frameConnectorFrameHeight);
+  let($frameConnectorFrameHeight = frameConnectorFrameHeight)
   difference() {
     color(color_cup)
     translate([0,0,-extra_down])

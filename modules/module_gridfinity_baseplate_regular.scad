@@ -2,6 +2,7 @@
 include <gridfinity_constants.scad>
 use <module_gridfinity_block.scad>
 use <module_gridfinity_baseplate_common.scad>
+use <module_gridfinity_frame_connectors.scad>
 
 debug_baseplate_regular = false;
 if(debug_baseplate_regular){
@@ -42,6 +43,7 @@ module baseplate_regular(
   secondaryCornerRadius = -1,
   cornerRoles = [1,1,1,1],
   roundedCorners = 15,
+  frameConnectorSettings = [],
   remove_bottom_taper = false) {
 
   if(env_help_enabled("debug")) echo("baseplate_regular", children=$children);
@@ -58,7 +60,26 @@ module baseplate_regular(
     cornerScrewEnabled ? magnetSize[1] + counterSinkDepth + minFloorThickness : 0,
     weightHolder ? weightDepth + minFloorThickness : 0,
     magnetSize.y + magnetZOffset + magnetTopCover);
+  frameConnectorFrameHeight = _frame_plain_connector_height(
+    outer_height = outer_height,
+    extra_down = frameBaseHeight,
+    height = 4);
   $frameBaseHeight = frameBaseHeight;
+  centerGridPosition = [
+    position_grid_in_outer_x == "near" || grid_num_x >= outer_num_x ? 0
+      : position_grid_in_outer_x == "far"
+        ? (outer_num_x-grid_num_x)*env_pitch().x
+        : (outer_num_x-grid_num_x)/2*env_pitch().x,
+    position_grid_in_outer_y == "near" || grid_num_y >= outer_num_y ? 0
+      : position_grid_in_outer_y == "far"
+        ? (outer_num_y-grid_num_y)*env_pitch().y
+        : (outer_num_y-grid_num_y)/2*env_pitch().y,
+    0];
+  allowConnectors = [
+    grid_num_y >= outer_num_y || position_grid_in_outer_y == "near",
+    grid_num_y >= outer_num_y || position_grid_in_outer_y == "far",
+    grid_num_x >= outer_num_x || position_grid_in_outer_x == "near",
+    grid_num_x >= outer_num_x || position_grid_in_outer_x == "far"];
 
     translate([0,0,frameBaseHeight])
     frame_plain(
@@ -104,4 +125,13 @@ module baseplate_regular(
         //wall adatives
         if($children >=2) children(1);
       }
+
+    let($allowConnectors = allowConnectors)
+    translate([0,0,frameBaseHeight])
+    translate(centerGridPosition)
+    frame_connector_clip_baseplate_previews(
+      width = grid_num_x,
+      depth = grid_num_y,
+      frameHeight = frameConnectorFrameHeight,
+      frameConnectorSettings = frameConnectorSettings);
 }
