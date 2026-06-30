@@ -53,6 +53,19 @@ module cylsq2(d1, d2, h) {
   square([d1, d1], center=true);
 }
 
+function _pad_oversize_bevel1_top() = 0.8;
+function _pad_oversize_radial_gap(margins) = margins ? 0.25 : 0;
+function _pad_oversize_corner_center() =
+  [env_corner_radius() + env_clearance().x/2, env_corner_radius() + env_clearance().y/2];
+function _pad_oversize_corner_position() =
+  [env_pitch().x/2, env_pitch().y/2] - _pad_oversize_corner_center();
+function _pad_oversize_bottom_taper_radius(radialgap) =
+  env_corner_radius() - gf_baseplate_upper_taper_height + radialgap;
+function _pad_oversize_small_bottom_radius(remove_bottom_taper, radialgap) =
+  remove_bottom_taper
+    ? _pad_oversize_bottom_taper_radius(radialgap)
+    : _pad_oversize_bevel1_top() + radialgap;
+
 module bin_outer_wall_clearance_cutout(
   num_x,
   num_y,
@@ -233,11 +246,9 @@ module pad_oversize(
 
   // pad_corner_position = [env_pitch().x/2 - 4,env_pitch().y/2 - 4]; 
   // must be 17 to be compatible
-  pad_corner_position = [
-    env_pitch().x/2-env_corner_radius()-env_clearance().x/2, 
-    env_pitch().y/2-env_corner_radius()-env_clearance().y/2];
+  pad_corner_position = _pad_oversize_corner_position();
 
-  bevel1_top = 0.8;     // z of top of bottom-most bevel (bottom of bevel is at z=0)
+  bevel1_top = _pad_oversize_bevel1_top();     // z of top of bottom-most bevel (bottom of bevel is at z=0)
   bevel2_bottom = 2.6;  // z of bottom of second bevel
   bevel2_top = 5;       // z of top of second bevel
   bonus_ht = 0.2;       // extra height (and radius) on second bevel
@@ -246,15 +257,15 @@ module pad_oversize(
   bottom_taper_height = use_bin_bottom_profile ? 1.9 : 1.9+bevel2_top-bevel2_bottom+bonus_ht;
   
   // female parts are a bit oversize for a nicer fit
-  radialgap = margins ? 0.25 : 0;  // oversize cylinders for a bit of clearance
+  radialgap = _pad_oversize_radial_gap(margins);  // oversize cylinders for a bit of clearance
   //axialdown = margins ? 0.1 : 0;   // a tiny bit of axial clearance present in Zack's design
   //remove axialdown as it messes up the placement of the attachements 
   axialdown =0;
   fudgeFactor = 0.01;
-  bottom_taper_radius = env_corner_radius()-2.15+radialgap;
+  bottom_taper_radius = _pad_oversize_bottom_taper_radius(radialgap);
   top_taper_radius = env_corner_radius()+0.25+radialgap+bonus_ht;
   top_taper_render_radius = top_taper_radius - (use_bin_bottom_profile ? 0.3 : 0);
-  small_bottom_radius = remove_bottom_taper ? bottom_taper_radius : 0.8+radialgap;
+  small_bottom_radius = _pad_oversize_small_bottom_radius(remove_bottom_taper, radialgap);
   // Match the lower base step fragment count to the larger top taper when $fn is not explicitly set.
   matched_fs = function(radius) $fn > 0 || !use_bin_bottom_profile || top_taper_render_radius <= 0 ? $fs : $fs * radius / top_taper_render_radius;
   
@@ -300,7 +311,8 @@ module pad_oversize(
             cylsq(d=1.6+2*radialgap, h=extend_down+fudgeFactor);
           }
           else {
-            cylinder(d=1.6+2*radialgap, h=extend_down+fudgeFactor, $fs=matched_fs(0.8+radialgap));
+            cylinder(d=1.6+2*radialgap, h=extend_down+fudgeFactor,
+              $fs=matched_fs(_pad_oversize_small_bottom_radius(false, radialgap)));
           }
         }
         //for baseplate patterns

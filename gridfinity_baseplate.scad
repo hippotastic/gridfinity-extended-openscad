@@ -55,6 +55,18 @@ Center_Screw_Enabled = false;
 Enable_Weight = false;
 //Removes the bottom taper
 Remove_Bottom_Taper = false;
+//Additional height added below the baseplate.
+bottom_padding = 0; // [0:0.05:20]
+//Use 45 degree chamfers and hollow cells to reduce bottom padding material.
+efficient_bottom_padding = true;
+//Inset the top edge at the bottom of the added padding.
+top_edge_slope = 0; // [0:0.05:10]
+//Inset the right edge at the bottom of the added padding.
+right_edge_slope = 0; // [0:0.05:10]
+//Inset the bottom edge at the bottom of the added padding.
+bottom_edge_slope = 0; // [0:0.05:10]
+//Inset the left edge at the bottom of the added padding.
+left_edge_slope = 0; // [0:0.05:10]
 
 /* [Base Plate Clips]*/
 Connector_Clip_Enabled = false;
@@ -354,6 +366,9 @@ else
       customGridEnabled = Custom_Grid_Enabled,
       gridPositions=[xpos1,xpos2,xpos3,xpos4,xpos5,xpos6,xpos7],
       remove_bottom_taper=Remove_Bottom_Taper,
+      bottomPadding = bottom_padding,
+      efficientBottomPadding = efficient_bottom_padding,
+      bottomPaddingEdgeSlopes = [top_edge_slope, right_edge_slope, bottom_edge_slope, left_edge_slope],
       frameConnectorSettings = FrameConnectorSettings(
         connectorOnly = Connector_Only,
         connectorPosition = Connector_Position,

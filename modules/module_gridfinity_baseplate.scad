@@ -68,6 +68,9 @@ module gridfinity_baseplate(
   customGridEnabled = false,
   gridPositions = [[1]],
   remove_bottom_taper = false,
+  bottomPadding = 0,
+  efficientBottomPadding = false,
+  bottomPaddingEdgeSlopes = [0, 0, 0, 0],
   frameConnectorSettings = FrameConnectorSettings())
 {
   _gridPositions = customGridEnabled ? gridPositions : [[1]];
@@ -127,6 +130,9 @@ module gridfinity_baseplate(
                 remove_bottom_taper = remove_bottom_taper,
                 secondary_corner_radius = secondary_corner_radius,
                 corner_roles = corner_roles,
+                bottomPadding = bottomPadding,
+                efficientBottomPadding = efficientBottomPadding,
+                bottomPaddingEdgeSlopes = bottomPaddingEdgeSlopes,
                 roundedCorners = gridPosCorners == 1 ? 15 : gridPosCorners - 2);
             }
           }
@@ -161,7 +167,10 @@ module baseplate(
   corner_roles = [1,1,1,1],
   roundedCorners = 15,
   frameConnectorSettings = [],
-  remove_bottom_taper = true)
+  remove_bottom_taper = true,
+  bottomPadding = 0,
+  efficientBottomPadding = false,
+  bottomPaddingEdgeSlopes = [0, 0, 0, 0])
 {
   assert_openscad_version();
   
@@ -198,7 +207,10 @@ module baseplate(
           cornerRoles = corner_roles,
       roundedCorners=roundedCorners,
       frameConnectorSettings=frameConnectorSettings,
-      remove_bottom_taper=remove_bottom_taper){
+      remove_bottom_taper=remove_bottom_taper,
+      bottomPadding=bottomPadding,
+      efficientBottomPadding=efficientBottomPadding,
+      bottomPaddingEdgeSlopes=bottomPaddingEdgeSlopes){
         frame_connector_cavities(
           width = width, 
           depth = depth,
