@@ -57,35 +57,18 @@ Enable_Weight = false;
 Remove_Bottom_Taper = false;
 
 /* [Base Plate Clips]*/
-Connector_Only = false;
-Connector_Position = "center_wall"; //["center_wall","intersection","both"]
-
 Connector_Clip_Enabled = false;
+Connector_Position = "center_wall"; //["center_wall","intersection","both"]
 Connector_Clip_Size = 10;
 Connector_Clip_Tolerance = 0.1;
-Connector_Clip_Snap_Enabled = false;
-Connector_Clip_Snap_Cutout_Preview = false;
 Connector_Clip_Baseplate_Preview = false;
+Connector_Only = false;
 
-/* [Thin Snap Together Top Settings] */
+/* [Base Plate Clips: Snap-Fit Feature] */
+Connector_Clip_Snap_Enabled = true;
 thin_snap_top_friction_fit = 0.10; // [0:0.05:0.30]
 thin_snap_top_z_axis_fit = 0.20; // [0:0.05:0.40]
 thin_snap_top_snap_flex = 0.30; // [0:0.05:0.60]
-
-//This feature is not yet finalised, or working properly.
-Connector_Butterfly_Enabled = false;
-Connector_Butterfly_Size = [5,4,1.5];
-Connector_Butterfly_Radius = 0.1;
-Connector_Butterfly_Tolerance = 0.1;
-
-//This feature is not yet finalised, or working properly.
-Connector_Filament_Enabled = false;
-Connector_Filament_Diameter = 2;
-Connector_Filament_Length = 8;
-
-//This feature is not yet finalised, or working properly.
-Connector_Snaps_Enabled = "disabled"; //["disabled","larger","smaller"]
-Connector_Snaps_Clearance = 0.2;
 
 /* [Custom Grid]*/
 //Enable custom grid, you will configure this in the (Lid not supported)
@@ -109,7 +92,7 @@ xpos7 = [0,0,0,0,0,0,0];
 //Work in progress,  Modify the default grid size. Will break compatibility
 pitch = [42,42,7];  //[0:1:9999]
 // minimum angle for a fragment (fragments = 360/fa).  Low is more fragments
-fa = 6;
+fa = 2;
 // minimum size of a fragment.  Low is more fragments
 fs = 0.1;
 // number of fragments, overrides $fa and $fs
@@ -266,7 +249,7 @@ module _connector_clip_preview(
     clipSnapFlex=thin_snap_top_snap_flex,
     fullIntersection=fullIntersection);
 
-  if(Connector_Clip_Snap_Cutout_Preview)
+  if($preview)
   color([0.1, 0.35, 0.9, 0.30])
   ClipCutterShape(
     size=Connector_Clip_Size,
@@ -294,15 +277,6 @@ if(Connector_Only)
     translate([0,30,0])
     _connector_clip_preview(straightWall=true);
   }
-
-  if(Connector_Butterfly_Enabled)
-  translate([20,0,0])
-  ButterFlyConnector(
-    size=[
-      Connector_Butterfly_Size.x-Connector_Butterfly_Tolerance,
-      Connector_Butterfly_Size.y-Connector_Butterfly_Tolerance,
-      Connector_Butterfly_Size.z-Connector_Butterfly_Tolerance],
-    r=Connector_Butterfly_Radius);
 }
 else
 {
@@ -386,15 +360,6 @@ else
         connectorClipEnabled = Connector_Clip_Enabled,
         connectorClipSize = Connector_Clip_Size,
         connectorClipTolerance = Connector_Clip_Tolerance,
-        connectorButterflyEnabled = Connector_Butterfly_Enabled,
-        connectorButterflySize = Connector_Butterfly_Size,
-        connectorButterflyRadius = Connector_Butterfly_Radius,
-        connectorButterflyTolerance = Connector_Butterfly_Tolerance,
-        connectorFilamentEnabled = Connector_Filament_Enabled,
-        connectorFilamentDiameter = Connector_Filament_Diameter,
-        connectorFilamentLength = Connector_Filament_Length,
-        connectorSnapsStyle = Connector_Snaps_Enabled,
-        connectorSnapsClearance = Connector_Snaps_Clearance,
         connectorClipSnapEnabled = Connector_Clip_Snap_Enabled,
         connectorClipSnapFrictionFit = thin_snap_top_friction_fit,
         connectorClipSnapZAxisFit = thin_snap_top_z_axis_fit,

@@ -41,68 +41,7 @@ if(show_frame_connector_demo){
     translate([30,0,0])
     ClipCutter(straightWall = true);
    }
-  
-  translate([0,-15,0])
-  ButterFlyConnector();
-  
-  translate([0,-30,0])
-  wall_snaps_cavity();
-  
-  translate([10,-30,0])
-  wall_snaps_additive();
-  
-  translate([20,-30,0])
-  sample(size = [10,10,4]){
-    wall_snaps_cavity(lock_height = 2, style = ConnectorSnapsStyle_larger);
-    wall_snaps_additive(lock_height = 2, style = ConnectorSnapsStyle_larger);
-  }
-  
-  translate([20,-50,0])
-  sample(size = [10,10,4]){
-    wall_snaps_cavity(lock_height = 2, style = ConnectorSnapsStyle_smaller);
-    wall_snaps_additive(lock_height = 2, style = ConnectorSnapsStyle_smaller);
-  }
-  
-  translate([20,-70,0])
-  sample(size = [15,2,4]){
-    wall_snaps_cavity(lock_height = 2, style = ConnectorSnapsStyle_wall);
-    wall_snaps_additive(lock_height = 2, style = ConnectorSnapsStyle_wall);
-  }
-  
-  difference(){
-    union(){
-    
-      translate([-5,0,0])
-      cube([10,10,2]);
-      
-      rotate([0,0,180])
-      wall_snaps_additive();
-    }
-    
-    wall_snaps_cavity();
-  }
- 
 }
-
-module sample(
-  size = [10,10,2]){
-  
-  difference(){
-    union(){
-    
-      translate([-size.x/2,0,0])
-      cube(size);
-      
-      if($children >=2) {
-        rotate([0,0,180])
-        children(1);
-      }
-    }
-  
-    if($children >=1) children(0); 
-  }
-}
-
 iFrameConnectors_ConnectorOnly=0;
 iFrameConnectors_Position=1;
 
@@ -110,22 +49,11 @@ iFrameConnectors_ClipEnabled=2;
 iFrameConnectors_ClipSize=3;
 iFrameConnectors_ClipTolerance=4;
 
-iFrameConnectors_ButterflyEnabled=5;
-iFrameConnectors_ButterflySize=6;
-iFrameConnectors_ButterflyRadius=7;
-iFrameConnectors_ButterflyTolerance=8;
-
-iFrameConnectors_FilamentEnabled=9;
-iFrameConnectors_FilamentDiameter=10;
-iFrameConnectors_FilamentLength=11;
-
-iFrameConnectors_SnapsStyle=12;
-iFrameConnectors_SnapsClearance=13;
-iFrameConnectors_ClipSnapEnabled=14;
-iFrameConnectors_ClipSnapFrictionFit=15;
-iFrameConnectors_ClipSnapZAxisFit=16;
-iFrameConnectors_ClipSnapFlex=17;
-iFrameConnectors_ClipBaseplatePreview=18;
+iFrameConnectors_ClipSnapEnabled=5;
+iFrameConnectors_ClipSnapFrictionFit=6;
+iFrameConnectors_ClipSnapZAxisFit=7;
+iFrameConnectors_ClipSnapFlex=8;
+iFrameConnectors_ClipBaseplatePreview=9;
 
 FrameConnectorsPosition_disabled = "disabled";
 FrameConnectorsPosition_centerwall = "center_wall";
@@ -137,15 +65,6 @@ function validateFrameConnectorsPosition(value) =
   assert(list_contains(FrameConnectorsPosition_values, value), typeerror("FrameConnectorsPosition", value))
   value;
 
-ConnectorSnapsStyle_disabled = "disabled";
-ConnectorSnapsStyle_larger = "larger";
-ConnectorSnapsStyle_smaller = "smaller";
-ConnectorSnapsStyle_wall = "wall";
-ConnectorSnapsStyle_values = [ConnectorSnapsStyle_disabled,ConnectorSnapsStyle_larger,ConnectorSnapsStyle_smaller, ConnectorSnapsStyle_wall];
-function validateConnectorSnapsStyle(value) = 
-  assert(list_contains(ConnectorSnapsStyle_values, value), typeerror("ConnectorSnapsStyle", value))
-  value;
-
 function FrameConnectorSettings(
   connectorOnly = false, 
   connectorPosition = FrameConnectorsPosition_centerwall, 
@@ -153,18 +72,6 @@ function FrameConnectorSettings(
   connectorClipEnabled = false,
   connectorClipSize = 10,
   connectorClipTolerance = 0.1, 
-  
-  connectorButterflyEnabled = false,
-  connectorButterflySize = [5,4,1.5],
-  connectorButterflyRadius = 0.1,
-  connectorButterflyTolerance = 0.1,
-
-  connectorFilamentEnabled = false,
-  connectorFilamentDiameter = 2,
-  connectorFilamentLength = 8,
-
-  connectorSnapsStyle = ConnectorSnapsStyle_disabled,
-  connectorSnapsClearance = 0.5,
 
   connectorClipSnapEnabled = false,
   connectorClipSnapFrictionFit = _clip_connector_snap_top_friction_fit(),
@@ -178,15 +85,6 @@ function FrameConnectorSettings(
       connectorClipEnabled,
       connectorClipSize,
       connectorClipTolerance,
-      connectorButterflyEnabled,
-      connectorButterflySize,
-      connectorButterflyRadius,
-      connectorButterflyTolerance,
-      connectorFilamentEnabled,
-      connectorFilamentDiameter,
-      connectorFilamentLength,
-      connectorSnapsStyle,
-      connectorSnapsClearance,
       connectorClipSnapEnabled,
       connectorClipSnapFrictionFit,
       connectorClipSnapZAxisFit,
@@ -198,125 +96,19 @@ function FrameConnectorSettings(
 
 function ValidateFrameConnectorSettings(settings) =
   assert(is_list(settings), "FrameConnector Settings must be a list")
-  assert(len(settings)==19, "FrameConnector Settings must length 19")
+  assert(len(settings)==10, "FrameConnector Settings must length 10")
   
     [settings[iFrameConnectors_ConnectorOnly],
       validateFrameConnectorsPosition(settings[iFrameConnectors_Position]),
       settings[iFrameConnectors_ClipEnabled],
       settings[iFrameConnectors_ClipSize],
       settings[iFrameConnectors_ClipTolerance],
-      settings[iFrameConnectors_ButterflyEnabled],
-      settings[iFrameConnectors_ButterflySize],
-      settings[iFrameConnectors_ButterflyRadius],
-      settings[iFrameConnectors_ButterflyTolerance],
-      settings[iFrameConnectors_FilamentEnabled],
-      settings[iFrameConnectors_FilamentDiameter],
-      settings[iFrameConnectors_FilamentLength],
-      validateConnectorSnapsStyle(settings[iFrameConnectors_SnapsStyle]),
-      settings[iFrameConnectors_SnapsClearance],
       settings[iFrameConnectors_ClipSnapEnabled],
       settings[iFrameConnectors_ClipSnapFrictionFit],
       settings[iFrameConnectors_ClipSnapZAxisFit],
       settings[iFrameConnectors_ClipSnapFlex],
       settings[iFrameConnectors_ClipBaseplatePreview]];
       
-module wall_snaps_additive(
-lock_height = 2,
-clearance = 0,
-hollow = 0.75,
-style = ConnectorSnapsStyle_larger) {
-  linear_extrude(height=lock_height+clearance*2)
-  difference(){
-    wall_snaps(lock_height = lock_height, style = style);
-    
-    offset(r=-hollow)
-    wall_snaps(lock_height = lock_height, style = style);
-  }
-}
-
-module wall_snaps_cavity(
-  lock_height = 2,
-  clearance = 0.2,
-  style = ConnectorSnapsStyle_larger) {
-  fudge_factor = 0.01;
-  translate([0,0,-clearance])
-  linear_extrude(height=lock_height+clearance*2)
-  union(){
-    wall_snaps(
-      lock_height = lock_height,
-      clearance = clearance,
-      style = style);
-
-    translate([1.25,0])
-    rotate(45)
-    square([1.5,1.5], center=true);
-  }
-}
-
-
-module wall_snaps(
-lock_height = 2,
-clearance = 0,
-style = ConnectorSnapsStyle_larger) {
-  fudge_factor = 0.01;
- 
-  if(style == ConnectorSnapsStyle_larger){
-    base_width = 1.5;
-    long_nub_size = 2;
-    long_nub_position = [-0.5,2.5]; 
-    short_nub = 1;
-    short_nub_position = [1.1,1.5];
-    base_size = [base_width, 0.1];
-
-    hull(){
-      translate([0, -fudge_factor])
-      square(base_size);
-      
-      translate(long_nub_position)
-      circle(d=long_nub_size+clearance);
-      
-      translate(short_nub_position)
-      circle(d=short_nub);
-    }
-  } else if (style == ConnectorSnapsStyle_smaller) {
-    base_width = 1.5;
-    long_nub_size = 2;
-    long_nub_position = [0.5,1.5]; 
-    short_nub = 1;
-    short_nub_position = [1.1,1.5];
-    base_size = [base_width, 0.1];
-    
-    hull(){
-      translate([0, -fudge_factor])
-      square(base_size);
-      
-      translate(long_nub_position)
-      circle(d=long_nub_size+clearance);
-      
-      translate(short_nub_position)
-      circle(d=short_nub);
-    }
-  } else if (style == ConnectorSnapsStyle_wall) {
-    base_width = 1.5;
-    long_nub_size = 2;
-    long_nub_position = [0.5,1]; 
-    short_nub = 1.5;
-    short_nub_position = [0.95,1];
-    base_size = [base_width, 0.1];
-    
-    hull(){
-      translate([0, -fudge_factor])
-      square(base_size);
-      
-      translate(long_nub_position)
-      circle(d=long_nub_size+clearance);
-      
-      translate(short_nub_position)
-      circle(d=short_nub);
-    }
-  }
-}
-
 module frame_connector_cavities(
   width = 1, 
   depth = 1,
@@ -338,19 +130,10 @@ module frame_connector_cavities(
     frameConnectorSettings[iFrameConnectors_ClipSnapZAxisFit];
   connectorClipSnapFlex =
     frameConnectorSettings[iFrameConnectors_ClipSnapFlex];
-  connectorButterflyEnabled = frameConnectorSettings[iFrameConnectors_ButterflyEnabled];
-  connectorButterflySize = frameConnectorSettings[iFrameConnectors_ButterflySize];
-  connectorButterflyRadius = frameConnectorSettings[iFrameConnectors_ButterflyRadius];
-  connectorButterflyTolerance = frameConnectorSettings[iFrameConnectors_ButterflyTolerance];
-  connectorSnapsStyle = frameConnectorSettings[iFrameConnectors_SnapsStyle];
-  connectorSnapsClearance = frameConnectorSettings[iFrameConnectors_SnapsClearance];
-  connectorFilamentEnabled = frameConnectorSettings[iFrameConnectors_FilamentEnabled];
-  connectorFilamentLength = frameConnectorSettings[iFrameConnectors_FilamentLength];
-  connectorFilamentDiameter = frameConnectorSettings[iFrameConnectors_FilamentDiameter];
 
-  if(connectorButterflyEnabled || connectorFilamentEnabled || connectorClipEnabled || connectorSnapsStyle != ConnectorSnapsStyle_disabled){
+  if(connectorClipEnabled){
     union(){
-      if(env_help_enabled("debug")) echo("frame_connector_cavities", gci=$gci, gc_size=$gc_size, gc_is_corner=$gc_is_corner, gc_position=$gc_position, width=width, depth=depth, connectorButterflyEnabled  = connectorButterflyEnabled, connectorFilamentEnabled = connectorFilamentEnabled, connectorClipEnabled = connectorClipEnabled, connectorClipSnapEnabled = connectorClipSnapEnabled, connectorSnapsStyle = connectorSnapsStyle);
+      if(env_help_enabled("debug")) echo("frame_connector_cavities", gci=$gci, gc_size=$gc_size, gc_is_corner=$gc_is_corner, gc_position=$gc_position, width=width, depth=depth, connectorClipEnabled = connectorClipEnabled, connectorClipSnapEnabled = connectorClipSnapEnabled);
         
       if(connectorPosition == "center_wall" || connectorPosition == "both")
       PositionCellCenterConnector(
@@ -358,45 +141,17 @@ module frame_connector_cavities(
         right=$gci.x>=$gc_count.x-1&&$gc_size.x==1&&$gc_size.y==1 && $allowConnectors[iAllowConnectorsRight],
         front=$gci.y==0&&$gc_size.x==1&&$gc_size.y==1 && $allowConnectors[iAllowConnectorsFront],
         back=$gci.y>=$gc_count.y-1&&$gc_size.x==1&&$gc_size.y==1&& $allowConnectors[iAllowConnectorsBack]) {
-          if($preview)
-            *rotate([0,0,90])
-            cylinder_printable(h=10,r=1);
-
-          if(connectorClipEnabled)
-            ClipCutter(size=connectorClipSize,
-              height= 0.8, //height of bevel1_top
-              frameHeight = connectorFrameHeight,
-              clearance = connectorClipTolerance,
-              cornerRadius = env_corner_radius(),
-              clipSnapEnabled = connectorClipSnapEnabled,
-              clipSnapFrictionFit = connectorClipSnapFrictionFit,
-              clipSnapZAxisFit = connectorClipSnapZAxisFit,
-              clipSnapFlex = connectorClipSnapFlex,
-              straightWall=true);
-        
-          if(connectorButterflyEnabled)
-            translate([0,0,-$frameBaseHeight])
-            rotate([0,0,90])
-            ButterFlyConnector(
-              size=connectorButterflySize,
-              r=connectorButterflyRadius,
-              clearance = connectorButterflyTolerance,
-              taper=false,half=false);
-
-          if(connectorFilamentEnabled)
-            translate([0,0,-$frameBaseHeight/2])
-            FilamentCutter(
-              l=connectorFilamentLength,
-              d=connectorFilamentDiameter);
-          
-          if(connectorSnapsStyle != ConnectorSnapsStyle_disabled)
-            translate([0,0,-$frameBaseHeight])
-            rotate([0,0,270])
-            wall_snaps_cavity(
-              lock_height = 2,
-              clearance = connectorSnapsClearance,
-              style = ConnectorSnapsStyle_wall);
-          }
+          ClipCutter(size=connectorClipSize,
+            height= 0.8, //height of bevel1_top
+            frameHeight = connectorFrameHeight,
+            clearance = connectorClipTolerance,
+            cornerRadius = env_corner_radius(),
+            clipSnapEnabled = connectorClipSnapEnabled,
+            clipSnapFrictionFit = connectorClipSnapFrictionFit,
+            clipSnapZAxisFit = connectorClipSnapZAxisFit,
+            clipSnapFlex = connectorClipSnapFlex,
+            straightWall=true);
+        }
 
         if(connectorPosition == "intersection" || connectorPosition == "both")
         PositionCellCornerConnector(
@@ -404,108 +159,19 @@ module frame_connector_cavities(
         right=$gci.x>=$gc_count.x-1 && $gc_size.x==1&&$gc_size.y==1,
         front=$gci.y==0&&$gc_size.x==1&&$gc_size.y==1,
         back=$gci.y>=$gc_count.y-1&&$gc_size.x==1&&$gc_size.y==1) {
-       
-          if($preview)
-            *rotate([0,0,90])
-            cylinder_printable(h=$corner ? 20 : 15,r=2);
-
-          if(connectorClipEnabled)
-            rotate([0,0,270])
-            ClipCutter(size=connectorClipSize,
-              height= 0.8, //height of bevel1_top
-              frameHeight = connectorFrameHeight,
-              clearance = connectorClipTolerance,
-              cornerRadius = env_corner_radius(),
-              clipSnapEnabled = connectorClipSnapEnabled,
-              clipSnapFrictionFit = connectorClipSnapFrictionFit,
-              clipSnapZAxisFit = connectorClipSnapZAxisFit,
-              clipSnapFlex = connectorClipSnapFlex,
-              straightIntersection = !$corner,
-              cornerIntersection = $corner);
-        
-          if(connectorButterflyEnabled && !$corner)
-            translate([0,0,-$frameBaseHeight])
-            rotate([0,0,90])
-            ButterFlyConnector(
-              size=connectorButterflySize,
-              r=connectorButterflyRadius,
-              clearance = connectorButterflyTolerance,
-              taper=false,half=false);
-
-         if(connectorSnapsStyle != ConnectorSnapsStyle_disabled && !$corner)
-            translate([0,0,-$frameBaseHeight])
-            rotate([0,0,270])
-            wall_snaps_cavity(
-              lock_height = 2,
-              clearance = connectorSnapsClearance,
-              style = connectorSnapsStyle);
-  
-          if(connectorFilamentEnabled && !$corner)
-            translate([0,0,-$frameBaseHeight/2])
-            FilamentCutter(
-              l=connectorFilamentLength,
-              d=connectorFilamentDiameter);
+          rotate([0,0,270])
+          ClipCutter(size=connectorClipSize,
+            height= 0.8, //height of bevel1_top
+            frameHeight = connectorFrameHeight,
+            clearance = connectorClipTolerance,
+            cornerRadius = env_corner_radius(),
+            clipSnapEnabled = connectorClipSnapEnabled,
+            clipSnapFrictionFit = connectorClipSnapFrictionFit,
+            clipSnapZAxisFit = connectorClipSnapZAxisFit,
+            clipSnapFlex = connectorClipSnapFlex,
+            straightIntersection = !$corner,
+            cornerIntersection = $corner);
         }
-    }
-  }
-}
-
-module frame_connectors_additives(
-  width = 1, 
-  depth = 1,
-  frameConnectorSettings = []) {
-
-  assert(is_list(frameConnectorSettings), "frameConnectorSettings must be a list");
-  
-  connectorPosition = frameConnectorSettings[iFrameConnectors_Position];
-  connectorClipEnabled = frameConnectorSettings[iFrameConnectors_ClipEnabled];
-  connectorClipSize = frameConnectorSettings[iFrameConnectors_ClipSize];
-  connectorClipTolerance = frameConnectorSettings[iFrameConnectors_ClipTolerance];
-  connectorButterflyEnabled = frameConnectorSettings[iFrameConnectors_ButterflyEnabled];
-  connectorButterflySize = frameConnectorSettings[iFrameConnectors_ButterflySize];
-  connectorButterflyRadius = frameConnectorSettings[iFrameConnectors_ButterflyRadius];
-  connectorButterflyTolerance = frameConnectorSettings[iFrameConnectors_ButterflyTolerance];
-  connectorSnapsStyle = frameConnectorSettings[iFrameConnectors_SnapsStyle];
-  connectorSnapsClearance = frameConnectorSettings[iFrameConnectors_SnapsClearance];
-  connectorFilamentEnabled = frameConnectorSettings[iFrameConnectors_FilamentEnabled];
-  connectorFilamentLength = frameConnectorSettings[iFrameConnectors_FilamentLength];
-  connectorFilamentDiameter = frameConnectorSettings[iFrameConnectors_FilamentDiameter];
-
-  if(connectorButterflyEnabled || connectorFilamentEnabled || connectorClipEnabled || connectorSnapsStyle != ConnectorSnapsStyle_disabled){
-    union(){
-      if(env_help_enabled("debug")) echo("frame_connectors_additives", gci=$gci, gc_size=$gc_size, gc_is_corner=$gc_is_corner, gc_position=$gc_position, width=width, depth=depth, connectorButterflyEnabled  = connectorButterflyEnabled, connectorFilamentEnabled = connectorFilamentEnabled, connectorClipEnabled = connectorClipEnabled, connectorSnapsStyle = connectorSnapsStyle);
-
-      if(connectorPosition == "center_wall" || connectorPosition == "both")
-      PositionCellCenterConnector(
-      left=$gci.x==0&&$gc_size.x==1&&$gc_size.y==1 && $allowConnectors[iAllowConnectorsLeft],
-      right=$gci.x>=$gc_count.x-1&&$gc_size.x==1&&$gc_size.y==1 && $allowConnectors[iAllowConnectorsRight],
-      front=$gci.y==0&&$gc_size.x==1&&$gc_size.y==1 && $allowConnectors[iAllowConnectorsFront],
-      back=$gci.y>=$gc_count.y-1&&$gc_size.x==1&&$gc_size.y==1&& $allowConnectors[iAllowConnectorsBack]) {
-        
-        if(connectorSnapsStyle != ConnectorSnapsStyle_disabled)
-          #translate([0,0,-$frameBaseHeight])
-          rotate([0,0,90])
-          wall_snaps_additive(
-            lock_height = 2,
-            clearance = connectorSnapsClearance,
-            style = ConnectorSnapsStyle_wall);
-      }
-
-          
-      if(connectorPosition == "intersection" || connectorPosition == "both")
-      PositionCellCornerConnector(
-      left=$gci.x==0&&$gc_size.x==1&&$gc_size.y==1,
-      right=$gci.x>=$gc_count.x-1 && $gc_size.x==1&&$gc_size.y==1,
-      front=$gci.y==0&&$gc_size.x==1&&$gc_size.y==1,
-      back=$gci.y>=$gc_count.y-1&&$gc_size.x==1&&$gc_size.y==1) {
-   
-       if(connectorSnapsStyle != ConnectorSnapsStyle_disabled && !$corner)
-          translate([0,0,-$frameBaseHeight])
-          rotate([0,0,90])
-          wall_snaps_additive(
-            lock_height = 2,
-            style = connectorSnapsStyle);
-      }
     }
   }
 }
@@ -824,30 +490,6 @@ module PositionCellCornerConnector(left, right, front, back){
       rotate([0,0,270])
       children();
     }
-  }
-}
-
-module FilamentCutter(
-    l = 5, 
-    d = 1.75){
-  translate([-fudgeFactor, 0,0])
-  rotate([90,0,90])
-  cylinder_printable(h=l,d=d);
-}
-
-module cylinder_printable(h=10,r=1,d,center=false){
-  r = is_num(d) ? d/2 : r;
-  d=2*r;
-
-  flat_top_width = d/2.5;
-  flat_top_height = d/2+0.5;
-
-  translate(center ? [0,0,0] : [0,0,h/2])
-  hull(){
-    //Printable Cylinder
-    cylinder(h=h,d=d, center=true);
-    translate([-flat_top_width/2,d/2-flat_top_height,-h/2])
-      cube([flat_top_width,flat_top_height,h]); 
   }
 }
 
@@ -1687,38 +1329,5 @@ module ClippedWall(
         translate([clippedWallThickness/2+clipRadius,clippedWallThickness/2+clipRadius,-fudgeFactor])
           cylinder(r=clipRadius,h=height+fudgeFactor*2);
       }
-  }
-}
-
-
-module ButterFlyConnector(
-  size = [5,3,2],
-  r = 0.5,
-  clearance = 0,
-  taper=false,
-  half=false)
-  {
-  h = taper ? size.y/2+size.z : size.z;
-  //render()
-  intersection(){
-    positions = [
-      [-(size.x/2-r), size.y/2-r, h/2],
-      [size.x/2-r, size.y/2-r, h/2],
-      [0, -(size.y/2-r), h/2]];
-    
-    union()
-    for(ri = [0:half?0:1]){
-      mirror([0,1,0]*ri)
-      hull(){
-        for(pi = [0:len(positions)-1]){
-          translate(positions[pi])
-            cylinder(h=h,r=r,center=true);
-        }
-      }
-    }
-    
-    if(taper)
-    rotate([0,90,0])
-    cylinder(h=size.x,r=size.y/2+size.z,$fn=4,center=true);
   }
 }

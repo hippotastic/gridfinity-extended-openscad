@@ -25,21 +25,6 @@ Default_Connector_Clip_Tolerance = 0.1;
 Default_Connector_Clip_Snap_Enabled = false;
 Default_Connector_Clip_Baseplate_Preview = false;
 
-//This feature is not yet finalised, or working properly. 
-Default_Connector_Butterfly_Enabled = false;
-Default_Connector_Butterfly_Size = [6,6,1.5];
-Default_Connector_Butterfly_Radius = 0.1;
-Default_Connector_Butterfly_Tolerance = 0.1;
-
-//This feature is not yet finalised, or working properly. 
-Default_Connector_Filament_Enabled = false;
-Default_Connector_Filament_Diameter = 2;
-Default_Connector_Filament_Length = 8;
-
-Default_Connector_Snaps_Enabled = false;
-Default_Connector_Snaps_Clearance = 0.1;
-
-
 debug_gridfinity_baseplate = false;
 if(debug_gridfinity_baseplate){
   $fn = 64;
@@ -215,10 +200,6 @@ module baseplate(
       frameConnectorSettings=frameConnectorSettings,
       remove_bottom_taper=remove_bottom_taper){
         frame_connector_cavities(
-          width = width, 
-          depth = depth,
-          frameConnectorSettings = frameConnectorSettings);
-        frame_connectors_additives(
           width = width, 
           depth = depth,
           frameConnectorSettings = frameConnectorSettings);
